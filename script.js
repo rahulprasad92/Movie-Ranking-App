@@ -2,6 +2,7 @@ const apiKey = '76a6aafa14d427cb60aea6edb019f420';
 const genreMap = new Map();
 let debounceTimer;
 let currentSuggestion = -1;
+const appendedMovieIds = new Set();
 
 function toggleTheme() {
   document.body.classList.toggle("light-mode");
@@ -96,6 +97,9 @@ async function getStreamingProviders(movieId) {
 }
 
 function appendMovie(movie, cast, trailerUrl, providers = [], isMain = false) {
+  if (appendedMovieIds.has(movie.id)) return;
+  appendedMovieIds.add(movie.id);
+
   const genreNames = movie.genre_ids.map(id => genreMap.get(id)).filter(Boolean);
   const isYouTubeEmbed = trailerUrl.includes('embed');
   const iconMap = {
@@ -154,6 +158,9 @@ async function searchMovie() {
   const year = document.getElementById("yearFilter").value;
 
   try {
+    document.getElementById('movieDetails').innerHTML = '';
+    appendedMovieIds.clear();
+
     const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(name)}&year=${year}`);
     const data = await res.json();
     const movie = data.results.find(m => genre ? m.genre_ids.includes(+genre) : true);
@@ -161,8 +168,6 @@ async function searchMovie() {
 
     const detailRes = await fetch(`https://api.themoviedb.org/3/movie/${movie.id}?api_key=${apiKey}`);
     const details = await detailRes.json();
-
-    document.getElementById('movieDetails').innerHTML = '';
 
     const cast = await getCast(movie.id);
     const trailerUrl = await getTrailer(movie.id, movie.title);
@@ -178,15 +183,11 @@ async function searchMovie() {
         .filter(p => p.id !== movie.id)
         .sort((a, b) => new Date(a.release_date) - new Date(b.release_date));
 
-      const addedIds = new Set([movie.id]);
       for (const part of uniqueParts) {
-        if (!addedIds.has(part.id)) {
-          const cast = await getCast(part.id);
-          const trailerUrl = await getTrailer(part.id, part.title);
-          const providers = await getStreamingProviders(part.id);
-          appendMovie(part, cast, trailerUrl, providers);
-          addedIds.add(part.id);
-        }
+        const cast = await getCast(part.id);
+        const trailerUrl = await getTrailer(part.id, part.title);
+        const providers = await getStreamingProviders(part.id);
+        appendMovie(part, cast, trailerUrl, providers);
       }
     }
   } catch (err) {
@@ -198,6 +199,8 @@ async function loadTrending() {
   const res = await fetch(`https://api.themoviedb.org/3/trending/movie/day?api_key=${apiKey}`);
   const data = await res.json();
   document.getElementById('movieDetails').innerHTML = '';
+  appendedMovieIds.clear();
+
   const movies = data.results.filter(m => m.release_date?.split('-')[0] >= 2000);
   for (const movie of movies) {
     const cast = await getCast(movie.id);
@@ -211,6 +214,8 @@ async function loadTopRated() {
   const res = await fetch(`https://api.themoviedb.org/3/movie/top_rated?api_key=${apiKey}`);
   const data = await res.json();
   document.getElementById('movieDetails').innerHTML = '';
+  appendedMovieIds.clear();
+
   const movies = data.results.filter(m => m.release_date?.split('-')[0] >= 2000);
   for (const movie of movies) {
     const cast = await getCast(movie.id);
@@ -279,6 +284,8 @@ async function loadFilteredMovies() {
   const res = await fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_genres=${genre}&primary_release_year=${year}`);
   const data = await res.json();
   document.getElementById('movieDetails').innerHTML = '';
+  appendedMovieIds.clear();
+
   for (const movie of data.results) {
     const cast = await getCast(movie.id);
     const trailerUrl = await getTrailer(movie.id, movie.title);
