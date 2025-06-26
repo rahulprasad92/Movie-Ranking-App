@@ -5,39 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>🎬 Movie Galaxy</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="new.css">
 </head>
 <body>
   <button class="theme-toggle" onclick="toggleTheme()">🌗 Toggle Theme</button>
   <h1>🎬 Movie Galaxy</h1>
   <div class="container">
     <div class="controls">
-      <div style="position: relative;">
-        <input id="movieInput" placeholder="Search movie..." oninput="debouncedSuggestions()" onkeydown="navigateSuggestions(event)" autocomplete="off">
+      <div class="search-wrapper">
+        <input 
+          id="movieInput" 
+          placeholder="Search movie..." 
+          oninput="debouncedSuggestions()" 
+          onkeydown="navigateSuggestions(event)" 
+          autocomplete="off"
+        />
         <div id="suggestions"></div>
       </div>
       <select id="genreFilter"></select>
       <select id="yearFilter"></select>
     </div>
+
     <div class="tabs">
       <button onclick="searchMovie()">🔍 Search</button>
       <button onclick="startVoiceSearch()">🎙️ Voice</button>
       <button onclick="loadTrending()">🔥 Trending</button>
       <button onclick="loadTopRated()">⭐ Top Rated</button>
     </div>
+
     <div id="movieDetails"></div>
+
     <div class="watchlist">
       <h2>📌 Your Watchlist</h2>
       <ul id="watchlist"></ul>
-    </div>
-    <div>
-  <ul id="watchlist"></ul>
-  <button onclick="clearWatchlist()" style="margin-top: 10px; padding: 6px 12px; background-color: crimson; color: white; border-radius: 6px; border: none; font-weight: bold;">
-    🗑️ Clear Watchlist
-  </button>
+      <button onclick="clearWatchlist()" class="clear-btn">
+        🗑️ Clear Watchlist
+      </button>
     </div>
   </div>
-<script src="script.js">
-</script>
+
+  <script src="script.js"></script>
 </body>
 </html>
