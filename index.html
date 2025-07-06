@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  
   <title>🎬 Movie Galaxy</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
 </head>
 <body>
   <button class="theme-toggle" onclick="toggleTheme()">🌗 Toggle Theme</button>
@@ -20,6 +22,7 @@
           onkeydown="navigateSuggestions(event)" 
           autocomplete="off"
         />
+        <p id="voiceStatus" style="text-align:center; color:var(--accent2); margin-top:5px;"></p>
         <div id="suggestions"></div>
       </div>
       <select id="genreFilter"></select>
@@ -32,6 +35,7 @@
       <button onclick="loadTrending()">🔥 Trending</button>
       <button onclick="loadTopRated()">⭐ Top Rated</button>
     </div>
+
     <div id="movieDetails"></div>
     <div class="watchlist">
       <h2>📌 Your Watchlist</h2>
@@ -41,6 +45,7 @@
       </button>
     </div>
   </div>
-  <script src="script.js"></script>
+
+  <script src="new.js"></script>
 </body>
 </html>
