@@ -228,19 +228,34 @@ async function loadTopRated() {
 }
 
 function startVoiceSearch() {
-  if (!('webkitSpeechRecognition' in window)) {
-    alert("🎙️ Voice search not supported on this device.");
+  if (typeof annyang === 'undefined') {
+    alert("🎙️ Voice search not supported in this browser. Please use Chrome.");
     return;
   }
-  const recognition = new webkitSpeechRecognition();
-  recognition.lang = 'en-US';
-  recognition.onresult = function (event) {
-    const transcript = event.results[0][0].transcript;
-    document.getElementById('movieInput').value = transcript;
-    searchMovie(); // This is async, but you're not awaiting it here
+
+  const movieInput = document.getElementById('movieInput');
+  const commands = {
+    '*movie': function (movie) {
+      movieInput.value = movie;
+      annyang.abort();
+      searchMovie();
+    }
   };
-  recognition.start();
+
+  annyang.removeCommands();
+  annyang.addCommands(commands);
+  annyang.setLanguage('en-IN');
+  annyang.start({ autoRestart: false, continuous: false });
+  document.getElementById("voiceStatus").textContent = "🎤 Listening...";  
+  annyang.addCallback('end', () => {
+    document.getElementById("voiceStatus").textContent = "";
+  });
+
+  annyang.addCallback('error', (e) => {
+    alert("Voice recognition error: " + e.error);
+  });
 }
+
 
 
 function addToWatchlist(movieTitle) {
