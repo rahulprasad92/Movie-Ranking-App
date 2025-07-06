@@ -11,6 +11,7 @@ function toggleTheme() {
 function debouncedSuggestions() {
   clearTimeout(debounceTimer);
   debounceTimer = setTimeout(showSuggestions, 300);
+  document.getElementById("suggestions").style.display = "block";
 }
 
 async function showSuggestions() {
@@ -28,10 +29,11 @@ async function showSuggestions() {
       const div = document.createElement('div');
       div.textContent = `${movie.title} (${movie.release_date?.split('-')[0] || 'N/A'})`;
       div.onclick = () => {
-        document.getElementById('movieInput').value = movie.title;
-        suggestionsDiv.innerHTML = '';
-        searchMovie();
-      };
+      document.getElementById('movieInput').value = movie.title;
+      suggestionsDiv.innerHTML = '';
+      searchMovie();
+    };
+
       suggestionsDiv.appendChild(div);
     });
   } catch (err) {
@@ -225,18 +227,21 @@ async function loadTopRated() {
   }
 }
 
-async function startVoiceSearch() {
-  if ('webkitSpeechRecognition' in window) {
-    const recognition = new webkitSpeechRecognition();
-    recognition.lang = 'en-US';
-    recognition.onresult = function (event) {
-      const transcript = event.results[0][0].transcript;
-      document.getElementById('movieInput').value = transcript;
-      searchMovie();
-    };
-    recognition.start();
+function startVoiceSearch() {
+  if (!('webkitSpeechRecognition' in window)) {
+    alert("🎙️ Voice search not supported on this device.");
+    return;
   }
+  const recognition = new webkitSpeechRecognition();
+  recognition.lang = 'en-US';
+  recognition.onresult = function (event) {
+    const transcript = event.results[0][0].transcript;
+    document.getElementById('movieInput').value = transcript;
+    searchMovie(); // This is async, but you're not awaiting it here
+  };
+  recognition.start();
 }
+
 
 function addToWatchlist(movieTitle) {
   let list = JSON.parse(localStorage.getItem('watchlist')) || [];
